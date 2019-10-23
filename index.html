@@ -6,20 +6,56 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+        html {
+            height: 100%;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #c0c0c0;
+            line-height: 20px;
+            height: 100%;
+        }
+        .main {
+            border-left: solid .5px #9d9e9c;
+            border-top: solid .5px #9d9e9c;
+        }
         .row {
             display: flex;
             text-align: center;
-            color: gray;
+            color: rgb(51, 50, 50);
             font-size: 20px;
             font-family: sans-serif;
+            
         }   
         .col{
-            width: 20px;
-            height: 20px;
-            border: solid 1px gainsboro;
+            min-width: 20px;
+            min-height: 20px;
+            border-right: solid .5px #9d9e9c;
+            border-bottom: solid .5px #9d9e9c;
+            float: left;
+            font-size: 12px;
+            color: rgb(36, 36, 36);
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .red {
-            background: red;
+        img {
+            height: 10px;
+            float: left;
+        }
+        .full {
+            border-top: solid 1.5px whitesmoke;
+            border-left: solid 1.5px whitesmoke;
+            border-right: solid 1.5px #616260;
+            border-bottom: solid 1.5px #616260;
+            
         }
     </style>
 </head>

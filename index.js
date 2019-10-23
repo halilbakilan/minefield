@@ -31,7 +31,7 @@ const randomOpen = () => {
   for (let i = 0; i < originalMatrix.length; i++) {
     for (let j = 0; j < originalMatrix[i].length; j++) {
       if (originalMatrix[i][j] === "□") {
-        selectableAxis.push([j, i]);
+        selectableAxis.push([i, j]);
       }
     }
   }
@@ -49,41 +49,55 @@ const calcBomb = () => {
       let availableBombTime = 0;
       let bombAxis = [];
 
-      if (j > 0 && i > 0 && originalMatrix[j - 1][i - 1] === "□") {
+      if (j > 0 && i > 0 && originalMatrix[i - 1][j - 1] === "□") {
         availableBombTime++;
-        bombAxis[j - 1 + "_" + (i - 1)] = true;
+        bombAxis[i - 1 + "_" + (j - 1)] = true;
       }
-      if (i > 0 && originalMatrix[j][i - 1] === "□") {
+      if (j > 0 && originalMatrix[i][j - 1] === "□") {
         availableBombTime++;
-        bombAxis[j + "_" + (i - 1)] = true;
+        bombAxis[i + "_" + (j - 1)] = true;
       }
-      if (j < (originalMatrix.length - 1) && i > 0 && originalMatrix[j + 1][i - 1] === "□") {
+      if (
+        i < originalMatrix.length - 1 &&
+        j > 0 &&
+        originalMatrix[i + 1][j - 1] === "□"
+      ) {
         availableBombTime++;
-        bombAxis[j + 1 + "_" + (i - 1)] = true;
+        bombAxis[i + 1 + "_" + (j - 1)] = true;
       }
-      if (j > 0 && originalMatrix[j - 1][i] === "□") {
+      if (i > 0 && originalMatrix[i - 1][j] === "□") {
         availableBombTime++;
-        bombAxis[j - 1 + "_" + i] = true;
+        bombAxis[i - 1 + "_" + j] = true;
       }
-      if (j < (originalMatrix.length - 1) && originalMatrix[j + 1][i] === "□") {
+      if (i < originalMatrix.length - 1 && originalMatrix[i + 1][j] === "□") {
         availableBombTime++;
-        bombAxis[j + 1 + "_" + i] = true;
+        bombAxis[i + 1 + "_" + j] = true;
       }
-      if (j > 0 && i < (originalMatrix.length - 1) && originalMatrix[j - 1][i + 1] === "□") {
+      if (
+        i > 0 &&
+        j < originalMatrix[i].length - 1 &&
+        originalMatrix[i - 1][j + 1] === "□"
+      ) {
         availableBombTime++;
-        bombAxis[j - 1 + "_" + (i + 1)] = true;
+        bombAxis[i - 1 + "_" + (j + 1)] = true;
       }
-      
-      if (i < (originalMatrix.length - 1) && originalMatrix[j][i + 1] === "□") {
+      if (
+        j < originalMatrix[i].length - 1 &&
+        originalMatrix[i][j + 1] === "□"
+      ) {
         availableBombTime++;
-        bombAxis[j + "_" + (i + 1)] = true;
+        bombAxis[i + "_" + (j + 1)] = true;
       }
-      if (j < (originalMatrix.length - 1) && i < (originalMatrix.length - 1) && originalMatrix[j + 1][i + 1] === "□") {
+      if (
+        i < originalMatrix.length - 1 &&
+        j < originalMatrix[i].length - 1 &&
+        originalMatrix[i + 1][j + 1] === "□"
+      ) {
         availableBombTime++;
-        bombAxis[j + 1 + "_" + (i + 1)] = true;
+        bombAxis[i + 1 + "_" + (j + 1)] = true;
       }
 
-      if (availableBombTime == originalMatrix[j][i]) {
+      if (availableBombTime == originalMatrix[i][j]) {
         newAllBomb = { ...newAllBomb, ...bombAxis };
       }
     }
@@ -106,64 +120,64 @@ const addBomb = () => {
       let availableBomb = 0;
       let bombAxis = [];
 
-      if (originalMatrix[j][i] > 0) {
-        if (j > 0 && i > 0) {
-          if (originalMatrix[j - 1][i - 1] === "□") {
+      if (originalMatrix[i][j] > 0) {
+        if (i > 0 && j > 0) {
+          if (originalMatrix[i - 1][j - 1] === "□") {
             availableBomb++;
-            bombAxis[j - 1 + "_" + (i - 1)] = true;
-          }
-        }
-
-        if (i > 0) {
-          if (originalMatrix[j][i - 1] === "□") {
-            availableBomb++;
-            bombAxis[j + "_" + (i - 1)] = true;
-          }
-        }
-
-        if (j < (originalMatrix.length - 1) && i > 0) {
-          if (originalMatrix[j + 1][i - 1] === "□") {
-            availableBomb++;
-            bombAxis[j + 1 + "_" + (i - 1)] = true;
+            bombAxis[i - 1 + "_" + (j - 1)] = true;
           }
         }
 
         if (j > 0) {
-          if (originalMatrix[j - 1][i] === "□") {
+          if (originalMatrix[i][j - 1] === "□") {
             availableBomb++;
-            bombAxis[j - 1 + "_" + i] = true;
+            bombAxis[i + "_" + (j - 1)] = true;
           }
         }
 
-        if (j < (originalMatrix.length - 1)) {
-          if (originalMatrix[j + 1][i] === "□") {
+        if (i < originalMatrix.length - 1 && j > 0) {
+          if (originalMatrix[i + 1][j - 1] === "□") {
             availableBomb++;
-            bombAxis[j + 1 + "_" + i] = true;
+            bombAxis[i + 1 + "_" + (j - 1)] = true;
           }
         }
 
-        if (j > 0 && i < (originalMatrix.length - 1)) {
-          if (originalMatrix[j - 1][i + 1] === "□") {
+        if (i > 0) {
+          if (originalMatrix[i - 1][j] === "□") {
             availableBomb++;
-            bombAxis[j - 1 + "_" + (i + 1)] = true;
+            bombAxis[i - 1 + "_" + j] = true;
           }
         }
 
-        if (i < (originalMatrix.length - 1)) {
-          if (originalMatrix[j][i + 1] === "□") {
+        if (i < originalMatrix.length - 1) {
+          if (originalMatrix[i + 1][j] === "□") {
             availableBomb++;
-            bombAxis[j + "_" + (i + 1)] = true;
+            bombAxis[i + 1 + "_" + j] = true;
           }
         }
 
-        if (j < (originalMatrix.length - 1) && i < (originalMatrix.length - 1)) {
-          if (originalMatrix[j + 1][i + 1] === "□") {
+        if (i > 0 && j < originalMatrix[i].length - 1) {
+          if (originalMatrix[i - 1][j + 1] === "□") {
             availableBomb++;
-            bombAxis[j + 1 + "_" + (i + 1)] = true;
+            bombAxis[i - 1 + "_" + (j + 1)] = true;
           }
         }
 
-        if (availableBomb == originalMatrix[j][i]) {
+        if (j < originalMatrix[i].length - 1) {
+          if (originalMatrix[i][j + 1] === "□") {
+            availableBomb++;
+            bombAxis[i + "_" + (j + 1)] = true;
+          }
+        }
+
+        if (i < originalMatrix.length - 1 && j < originalMatrix[i].length - 1) {
+          if (originalMatrix[i + 1][j + 1] === "□") {
+            availableBomb++;
+            bombAxis[i + 1 + "_" + (j + 1)] = true;
+          }
+        }
+
+        if (availableBomb == originalMatrix[i][j]) {
           newAllBomb = { ...newAllBomb, ...bombAxis };
         }
       }
@@ -180,10 +194,7 @@ const addBomb = () => {
   }
 };
 
-
 const setNonBomb = () => {
-
-
   let notAllBomb = {};
 
   for (let i = 0; i < originalMatrix.length; i++) {
@@ -191,118 +202,116 @@ const setNonBomb = () => {
       let availableBombTime = 0;
       let notBombAxis = {};
 
-      if (originalMatrix[j][i] > 0) {
-        if (j > 0 && i > 0) {
-          if (originalMatrix[j - 1][i - 1] === "□") {
-            if(allBomb[j - 1 + "_" + (i - 1)]){
+      if (originalMatrix[i][j] > 0) {
+        if (i > 0 && j > 0) {
+          if (originalMatrix[i - 1][j - 1] === "□") {
+            if (allBomb[i - 1 + "_" + (j - 1)]) {
               availableBombTime++;
             } else {
-              notBombAxis[j - 1 + "_" + (i - 1)] = true;
-            }
-          }
-        }
-
-        if (i > 0) {
-          if (originalMatrix[j][i - 1] === "□") {
-            if(allBomb[j + "_" + (i - 1)]){
-              availableBombTime++;
-            } else{
-              notBombAxis[j + "_" + (i - 1)] = true;
-            }
-          }
-        }
-
-        if (j < (originalMatrix.length - 1) && i > 0) {
-          if (originalMatrix[j + 1][i - 1] === "□") {
-            if(allBomb[j + 1 + "_" + (i - 1)]){
-              availableBombTime++;
-            } else {
-              notBombAxis[j + 1 + "_" + (i - 1)] = true;
+              notBombAxis[i - 1 + "_" + (j - 1)] = true;
             }
           }
         }
 
         if (j > 0) {
-          if (originalMatrix[j - 1][i] === "□") {
-            if(allBomb[j - 1 + "_" + i]){
+          if (originalMatrix[i][j - 1] === "□") {
+            if (allBomb[i + "_" + (j - 1)]) {
               availableBombTime++;
             } else {
-              notBombAxis[j - 1 + "_" + i] = true;
+              notBombAxis[i + "_" + (j - 1)] = true;
             }
           }
         }
 
-        if (j < (originalMatrix.length - 1)) {
-          if (originalMatrix[j + 1][i] === "□") {
-            if(allBomb[j + 1 + "_" + i]){
+        if (i < originalMatrix.length - 1 && j > 0) {
+          if (originalMatrix[i + 1][j - 1] === "□") {
+            if (allBomb[i + 1 + "_" + (j - 1)]) {
               availableBombTime++;
             } else {
-              notBombAxis[j + 1 + "_" + i] = true;
+              notBombAxis[i + 1 + "_" + (j - 1)] = true;
             }
           }
         }
 
-        if (j > 0 && i < (originalMatrix.length - 1)) {
-          if (originalMatrix[j - 1][i + 1] === "□") {
-            if(allBomb[j - 1 + "_" + (i + 1)]){
+        if (i > 0) {
+          if (originalMatrix[i - 1][j] === "□") {
+            if (allBomb[i - 1 + "_" + j]) {
               availableBombTime++;
             } else {
-              notBombAxis[j - 1 + "_" + (i + 1)] = true;
+              notBombAxis[i - 1 + "_" + j] = true;
             }
           }
         }
 
-        if (i < (originalMatrix.length - 1)) {
-          if (originalMatrix[j][i + 1] === "□") {
-            if(allBomb[j + "_" + (i + 1)]){
+        if (i < originalMatrix.length - 1) {
+          if (originalMatrix[i + 1][j] === "□") {
+            if (allBomb[i + 1 + "_" + j]) {
               availableBombTime++;
-            }
-            else {
-              notBombAxis[j + "_" + (i + 1)] = true;
+            } else {
+              notBombAxis[i + 1 + "_" + j] = true;
             }
           }
         }
 
-        if (j < (originalMatrix.length - 1) && i < (originalMatrix.length - 1)) {
-          if (originalMatrix[j + 1][i + 1] === "□") {
-            if(allBomb[j + 1 + "_" + (i + 1)]){
+        if (i > 0 && j < originalMatrix[i].length - 1) {
+          if (originalMatrix[i - 1][j + 1] === "□") {
+            if (allBomb[i - 1 + "_" + (j + 1)]) {
               availableBombTime++;
-            }
-            else{
-              notBombAxis[j + 1 + "_" + (i + 1)] = true;
+            } else {
+              notBombAxis[i - 1 + "_" + (j + 1)] = true;
             }
           }
         }
 
-        if (availableBombTime == originalMatrix[j][i]) {
+        if (j < originalMatrix[i].length - 1) {
+          if (originalMatrix[i][j + 1] === "□") {
+            if (allBomb[i + "_" + (j + 1)]) {
+              availableBombTime++;
+            } else {
+              notBombAxis[i + "_" + (j + 1)] = true;
+            }
+          }
+        }
+
+        if (i < originalMatrix.length - 1 && j < originalMatrix[i].length - 1) {
+          if (originalMatrix[i + 1][j + 1] === "□") {
+            if (allBomb[i + 1 + "_" + (j + 1)]) {
+              availableBombTime++;
+            } else {
+              notBombAxis[i + 1 + "_" + (j + 1)] = true;
+            }
+          }
+        }
+
+        if (availableBombTime == originalMatrix[i][j]) {
           notAllBomb = { ...notAllBomb, ...notBombAxis };
         }
-
       }
     }
   }
 
-  
-  socket.send("open " + Object.keys(notAllBomb)[0].split('_')[1] + " " + Object.keys(notAllBomb)[0].split('_')[0]);
+  socket.send("open " + Object.keys(notAllBomb)[0].split("_")[1] + " " + Object.keys(notAllBomb)[0].split("_")[0]);
   socket.send("map");
-    
-}
-
-
+};
 
 const matrixToHtml = () => {
-  document.body.innerHTML = "";
-  let data = "";
+  let data = "<div class='main'>";
   for (let i = 0; i < originalMatrix.length; i++) {
     data += '<div class="row">';
     for (let j = 0; j < originalMatrix[i].length; j++) {
       if (allBomb[i + "_" + j]) {
-        data += '<div class="col red"></div>';
-      } else {
+        data += '<div class="col full"><img src="./flag.svg"></div>';
+      } else if (originalMatrix[i][j] == 0) {
+        data += '<div class="col"></div>';
+      } else if (originalMatrix[i][j] > 0) {
         data += '<div class="col">' + originalMatrix[i][j] + "</div>";
+      } else if (originalMatrix[i][j] == "*") {
+        data += '<div class="col"><img src="./bomb.svg"></div>';
+      } else {
+        data += '<div class="col full"></div>';
       }
     }
     data += "</div>";
   }
-  document.body.innerHTML += data;
+  document.body.innerHTML = data + "</div>";
 };
