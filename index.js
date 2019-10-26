@@ -3,41 +3,86 @@ const socket = new WebSocket("ws://hometask.eg1236.com/game1/");
 socket.addEventListener("open", event => {
   socket.send("help");
   socket.send("new 1");
-  socket.send("map");
 });
 
-let firstPlay = true;
 let originalMatrix = [];
 let allBomb = {};
+let firstPlay = true;
+let status = "";
+let lose = false;
+let nonAllBombGlobal = {};
 
 socket.addEventListener("message", event => {
   const [type, ...rest] = event.data.split(/\n/);
-  if (type === "map:") {
+  if (type == " " || type == "") {
+  } else if (type === "new: OK") {
+    socket.send("map");
+  } else if (type === "open: OK") {
+    if (status === "") {
+    } else if (status === "calcBomb" && !lose) {
+      socket.send("map");
+    } else if (status === "openNonBomb" && !lose) {
+      if (Object.keys(nonAllBombGlobal).length > 1) {
+        delete nonAllBombGlobal[Object.keys(nonAllBombGlobal)[0]];
+        openNonBomb();
+      } else if (Object.keys(nonAllBombGlobal).length === 1) {
+        status = "calcBomb";
+        socket.send(
+          "open " +
+            Object.keys(nonAllBombGlobal)[0].split("_")[1] +
+            " " +
+            Object.keys(nonAllBombGlobal)[0].split("_")[0]
+        );
+      }
+    }
+  } else if (type === "open: You lose") {
+    lose = true;
+    restart();
+  } else if (type === "map:") {
     originalMatrix = rest.slice(0, rest.length - 1).map(item => item.split(""));
     matrixToHtml();
     if (firstPlay) {
       randomOpen();
       firstPlay = false;
-    } else {
-      calcBomb();
     }
-  } else {
+    if (status === "") {
+    } else if (status === "calcBomb") {
+      status = "";
+      calcBomb();
+    } else if (status === "won") {
+      alert("Won");
+    }
+  } else if (type.indexOf("You win") > -1) {
+    status = "won";
+    socket.send("map");
   }
 });
+
+const restart = () => {
+  nonAllBombGlobal = new Object();
+  originalMatrix = new Array();
+  allBomb = new Object();
+  firstPlay = true;
+  status === "";
+  lose = false;
+  socket.send("new 1");
+};
 
 const randomOpen = () => {
   let selectableAxis = [],
     xy = 0;
   for (let i = 0; i < originalMatrix.length; i++) {
     for (let j = 0; j < originalMatrix[i].length; j++) {
-      if (originalMatrix[i][j] === "□") {
-        selectableAxis.push([i, j]);
+      if (originalMatrix[i][j] === "□" && !allBomb[j + "_" + i]) {
+        selectableAxis.push([j, i]);
       }
     }
   }
-  xy = Math.floor(Math.random() * selectableAxis.length);
-  socket.send("open " + selectableAxis[xy][0] + " " + selectableAxis[xy][1]);
-  socket.send("map");
+  if (selectableAxis.length > 0) {
+    xy = Math.floor(Math.random() * selectableAxis.length);
+    status = "calcBomb";
+    socket.send("open " + selectableAxis[xy][0] + " " + selectableAxis[xy][1]);
+  }
 };
 
 const calcBomb = () => {
@@ -290,8 +335,22 @@ const setNonBomb = () => {
     }
   }
 
-  socket.send("open " + Object.keys(notAllBomb)[0].split("_")[1] + " " + Object.keys(notAllBomb)[0].split("_")[0]);
-  socket.send("map");
+  if (Object.keys(notAllBomb).length > 0) {
+    nonAllBombGlobal = { ...notAllBomb };
+    openNonBomb();
+  } else {
+    randomOpen();
+  }
+};
+
+const openNonBomb = () => {
+  status = "openNonBomb";
+  socket.send(
+    "open " +
+      Object.keys(nonAllBombGlobal)[0].split("_")[1] +
+      " " +
+      Object.keys(nonAllBombGlobal)[0].split("_")[0]
+  );
 };
 
 const matrixToHtml = () => {
