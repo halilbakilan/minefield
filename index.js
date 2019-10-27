@@ -24,7 +24,7 @@ socket.addEventListener("message", event => {
       if (Object.keys(nonAllBombGlobal).length > 0) {
         openNonBomb();
       }
-    } else if (lose === "lose") {
+    } else if (type === "lose") {
       socket.send("map");
     }
   } else if (type === "open: You lose") {
