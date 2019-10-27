@@ -2,56 +2,57 @@ const socket = new WebSocket("ws://hometask.eg1236.com/game1/");
 
 socket.addEventListener("open", event => {
   socket.send("help");
-  socket.send("new 3");
+  socket.send("new " + level);
 });
 
+let level = 1;
 let originalMatrix = [];
 let allBomb = {};
-let firstPlay = true;
 let status = "";
-let lose = false;
 let nonAllBombGlobal = {};
 
 socket.addEventListener("message", event => {
   const [type, ...rest] = event.data.split(/\n/);
   if (type == " " || type == "") {
   } else if (type === "new: OK") {
+    status = "new";
     socket.send("map");
   } else if (type === "open: OK") {
     if (status === "") {
-    } else if (status === "calcBomb" && !lose) {
+    } else if (status === "calcBomb") {
       socket.send("map");
-    } else if (status === "openNonBomb" && !lose) {
-      if (Object.keys(nonAllBombGlobal).length > 1) {
-        delete nonAllBombGlobal[Object.keys(nonAllBombGlobal)[0]];
+    } else if (status === "openNonBomb") {
+      if (Object.keys(nonAllBombGlobal).length > 0) {
         openNonBomb();
-      } else if (Object.keys(nonAllBombGlobal).length === 1) {
-        status = "calcBomb";
-        socket.send(
-          "open " +
-            Object.keys(nonAllBombGlobal)[0].split("_")[1] +
-            " " +
-            Object.keys(nonAllBombGlobal)[0].split("_")[0]
-        );
       }
+    } else if(lose === 'lose'){
+      socket.send("map");
     }
   } else if (type === "open: You lose") {
-    lose = true;
-    restart();
+    status = 'lose';
+    socket.send("map");
+
   } else if (type === "map:") {
     originalMatrix = rest.slice(0, rest.length - 1).map(item => item.split(""));
-    matrixToHtml();
-    if (firstPlay) {
-      randomOpen();
-      firstPlay = false;
-    }
-    if (status === "") {
+    if (status === "new") {
+      status = "";
+      calcBomb();
     } else if (status === "calcBomb") {
       status = "";
       calcBomb();
     } else if (status === "won") {
-      alert("Won");
+      if(level < 4){
+        setTimeout(() => {
+          level++;
+          restart();
+        }, 3000);
+      }
+    } else if(status === "lose"){
+      setTimeout(() => {
+        restart();
+      }, 3000);
     }
+    matrixToHtml();
   } else if (type.indexOf("You win") > -1) {
     status = "won";
     socket.send("map");
@@ -62,10 +63,8 @@ const restart = () => {
   nonAllBombGlobal = new Object();
   originalMatrix = new Array();
   allBomb = new Object();
-  firstPlay = true;
-  status === "";
-  lose = false;
-  socket.send("new 3");
+  status = "";
+  socket.send("new " + level);
 };
 
 const randomOpen = () => {
@@ -344,13 +343,18 @@ const setNonBomb = () => {
 };
 
 const openNonBomb = () => {
-  status = "openNonBomb";
+  if (Object.keys(nonAllBombGlobal).length > 1) {
+    status = "openNonBomb";
+  } else {
+    status = "calcBomb";
+  }
   socket.send(
     "open " +
       Object.keys(nonAllBombGlobal)[0].split("_")[1] +
       " " +
       Object.keys(nonAllBombGlobal)[0].split("_")[0]
   );
+  delete nonAllBombGlobal[Object.keys(nonAllBombGlobal)[0]];
 };
 
 const matrixToHtml = () => {
@@ -358,14 +362,18 @@ const matrixToHtml = () => {
   for (let i = 0; i < originalMatrix.length; i++) {
     data += '<div class="row">';
     for (let j = 0; j < originalMatrix[i].length; j++) {
-      if (allBomb[i + "_" + j]) {
+      if (originalMatrix[i][j] == "*") {
+        if(status === 'won'){
+          data += '<div class="col full"><img src="./flag.svg"></div>';
+        } else {
+          data += '<div class="col"><img src="./bomb.svg"></div>';
+        }
+      } else if (allBomb[i + "_" + j]) {
         data += '<div class="col full"><img src="./flag.svg"></div>';
       } else if (originalMatrix[i][j] == 0) {
         data += '<div class="col"></div>';
       } else if (originalMatrix[i][j] > 0) {
         data += '<div class="col">' + originalMatrix[i][j] + "</div>";
-      } else if (originalMatrix[i][j] == "*") {
-        data += '<div class="col"><img src="./bomb.svg"></div>';
       } else {
         data += '<div class="col full"></div>';
       }
