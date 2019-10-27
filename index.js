@@ -2,7 +2,7 @@ const socket = new WebSocket("ws://hometask.eg1236.com/game1/");
 
 socket.addEventListener("open", event => {
   socket.send("help");
-  socket.send("new 1");
+  socket.send("new 3");
 });
 
 let originalMatrix = [];
@@ -65,7 +65,7 @@ const restart = () => {
   firstPlay = true;
   status === "";
   lose = false;
-  socket.send("new 1");
+  socket.send("new 3");
 };
 
 const randomOpen = () => {
@@ -73,7 +73,7 @@ const randomOpen = () => {
     xy = 0;
   for (let i = 0; i < originalMatrix.length; i++) {
     for (let j = 0; j < originalMatrix[i].length; j++) {
-      if (originalMatrix[i][j] === "□" && !allBomb[j + "_" + i]) {
+      if (originalMatrix[i][j] === "□" && !allBomb[i + "_" + j]) {
         selectableAxis.push([j, i]);
       }
     }
