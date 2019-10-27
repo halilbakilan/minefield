@@ -5,49 +5,47 @@ socket.addEventListener("open", event => {
   socket.send("new " + level);
 });
 
+let status = "new";
 let level = 1;
+
 let originalMatrix = [];
+
 let allBomb = {};
-let status = "";
 let nonAllBombGlobal = {};
 
 socket.addEventListener("message", event => {
   const [type, ...rest] = event.data.split(/\n/);
-  if (type == " " || type == "") {
-  } else if (type === "new: OK") {
-    status = "new";
+  if (type === "new: OK") {
     socket.send("map");
   } else if (type === "open: OK") {
-    if (status === "") {
-    } else if (status === "calcBomb") {
+    if (status === "calcBomb") {
       socket.send("map");
     } else if (status === "openNonBomb") {
       if (Object.keys(nonAllBombGlobal).length > 0) {
         openNonBomb();
       }
-    } else if(lose === 'lose'){
+    } else if (lose === "lose") {
       socket.send("map");
     }
   } else if (type === "open: You lose") {
-    status = 'lose';
+    status = "lose";
     socket.send("map");
-
   } else if (type === "map:") {
     originalMatrix = rest.slice(0, rest.length - 1).map(item => item.split(""));
     if (status === "new") {
-      status = "";
+      status = "notNew";
       calcBomb();
     } else if (status === "calcBomb") {
-      status = "";
+      status = "notNew";
       calcBomb();
     } else if (status === "won") {
-      if(level < 4){
+      if (level < 4) {
         setTimeout(() => {
           level++;
           restart();
         }, 3000);
       }
-    } else if(status === "lose"){
+    } else if (status === "lose") {
       setTimeout(() => {
         restart();
       }, 3000);
@@ -63,7 +61,7 @@ const restart = () => {
   nonAllBombGlobal = new Object();
   originalMatrix = new Array();
   allBomb = new Object();
-  status = "";
+  status = "new";
   socket.send("new " + level);
 };
 
@@ -101,11 +99,7 @@ const calcBomb = () => {
         availableBombTime++;
         bombAxis[i + "_" + (j - 1)] = true;
       }
-      if (
-        i < originalMatrix.length - 1 &&
-        j > 0 &&
-        originalMatrix[i + 1][j - 1] === "□"
-      ) {
+      if (i < originalMatrix.length - 1 && j > 0 && originalMatrix[i + 1][j - 1] === "□") {
         availableBombTime++;
         bombAxis[i + 1 + "_" + (j - 1)] = true;
       }
@@ -117,30 +111,18 @@ const calcBomb = () => {
         availableBombTime++;
         bombAxis[i + 1 + "_" + j] = true;
       }
-      if (
-        i > 0 &&
-        j < originalMatrix[i].length - 1 &&
-        originalMatrix[i - 1][j + 1] === "□"
-      ) {
+      if (i > 0 && j < originalMatrix[i].length - 1 && originalMatrix[i - 1][j + 1] === "□") {
         availableBombTime++;
         bombAxis[i - 1 + "_" + (j + 1)] = true;
       }
-      if (
-        j < originalMatrix[i].length - 1 &&
-        originalMatrix[i][j + 1] === "□"
-      ) {
+      if (j < originalMatrix[i].length - 1 && originalMatrix[i][j + 1] === "□") {
         availableBombTime++;
         bombAxis[i + "_" + (j + 1)] = true;
       }
-      if (
-        i < originalMatrix.length - 1 &&
-        j < originalMatrix[i].length - 1 &&
-        originalMatrix[i + 1][j + 1] === "□"
-      ) {
+      if (i < originalMatrix.length - 1 && j < originalMatrix[i].length - 1 && originalMatrix[i + 1][j + 1] === "□") {
         availableBombTime++;
         bombAxis[i + 1 + "_" + (j + 1)] = true;
       }
-
       if (availableBombTime == originalMatrix[i][j]) {
         newAllBomb = { ...newAllBomb, ...bombAxis };
       }
@@ -348,12 +330,7 @@ const openNonBomb = () => {
   } else {
     status = "calcBomb";
   }
-  socket.send(
-    "open " +
-      Object.keys(nonAllBombGlobal)[0].split("_")[1] +
-      " " +
-      Object.keys(nonAllBombGlobal)[0].split("_")[0]
-  );
+  socket.send("open " + Object.keys(nonAllBombGlobal)[0].split("_")[1] + " " + Object.keys(nonAllBombGlobal)[0].split("_")[0]);
   delete nonAllBombGlobal[Object.keys(nonAllBombGlobal)[0]];
 };
 
@@ -363,7 +340,7 @@ const matrixToHtml = () => {
     data += '<div class="row">';
     for (let j = 0; j < originalMatrix[i].length; j++) {
       if (originalMatrix[i][j] == "*") {
-        if(status === 'won'){
+        if (status === "won") {
           data += '<div class="col full"><img src="./flag.svg"></div>';
         } else {
           data += '<div class="col"><img src="./bomb.svg"></div>';
