@@ -43,12 +43,12 @@ socket.addEventListener("message", event => {
         setTimeout(() => {
           level++;
           restart();
-        }, 3000);
+        }, 500);
       }
     } else if (status === "lose") {
       setTimeout(() => {
         restart();
-      }, 3000);
+      }, 500);
     }
     matrixToHtml();
   } else if (type.indexOf("You win") > -1) {
